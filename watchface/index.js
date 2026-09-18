@@ -16,6 +16,9 @@ var LABEL_HR_W = 39
 var HR_X = 32
 var BAT_BAR_X = 284
 var MARS_FRAMES = 48
+var MARS_SIZE = 268
+var MARS_X = 61
+var MARS_Y = 114
 var built = false
 
 function pad2(n) {
@@ -125,11 +128,18 @@ function make() {
   var timeSensor = hmSensor.createSensor(hmSensor.id.TIME)
   var slot = marsSlot(timeSensor)
 
-  var marsImg = hmUI.createWidget(hmUI.widget.IMG, {
+  hmUI.createWidget(hmUI.widget.IMG, {
     x: 0,
     y: 0,
     w: W,
     h: H,
+    src: 'starfield.png',
+  })
+  var marsImg = hmUI.createWidget(hmUI.widget.IMG, {
+    x: MARS_X,
+    y: MARS_Y,
+    w: MARS_SIZE,
+    h: MARS_SIZE,
     src: marsPath(slot),
   })
 
@@ -205,9 +215,14 @@ function make() {
   })
 
   var batterySensor = hmSensor.createSensor(hmSensor.id.BATTERY)
+  var lastSlot = slot
+
   function updateBatBar() {
+    var bat = hmSensor.createSensor(hmSensor.id.BATTERY)
     var pct = 0
-    if (batterySensor && typeof batterySensor.current === 'number') {
+    if (bat && typeof bat.current === 'number') {
+      pct = bat.current
+    } else if (batterySensor && typeof batterySensor.current === 'number') {
       pct = batterySensor.current
     }
     if (pct < 0) {
@@ -222,18 +237,53 @@ function make() {
     }
     batBar.setProperty(hmUI.prop.LEVEL, lvl)
   }
+
+  function updateMars() {
+    var t = hmSensor.createSensor(hmSensor.id.TIME)
+    var next = marsSlot(t)
+    if (next === lastSlot) {
+      return
+    }
+    lastSlot = next
+    marsImg.setProperty(hmUI.prop.MORE, {
+      x: MARS_X,
+      y: MARS_Y,
+      w: MARS_SIZE,
+      h: MARS_SIZE,
+      src: marsPath(next),
+    })
+  }
+
+  function refresh() {
+    updateMars()
+    updateBatBar()
+  }
+
   updateBatBar()
 
-  var lastSlot = slot
-  if (typeof timer !== 'undefined' && timer.createTimer) {
-    timer.createTimer(60000, 60000, function () {
-      var next = marsSlot(timeSensor)
-      if (next !== lastSlot) {
-        lastSlot = next
-        marsImg.setProperty(hmUI.prop.SRC, marsPath(next))
-      }
-      updateBatBar()
+  if (hmUI.widget.WIDGET_DELEGATE) {
+    hmUI.createWidget(hmUI.widget.WIDGET_DELEGATE, {
+      resume_call: function () {
+        refresh()
+      },
     })
+  }
+
+  if (timeSensor && timeSensor.addEventListener && timeSensor.event && timeSensor.event.MINUTEEND) {
+    timeSensor.addEventListener(timeSensor.event.MINUTEEND, function () {
+      refresh()
+    })
+  }
+
+  if (typeof timer !== 'undefined' && timer.createTimer) {
+    timer.createTimer(
+      1000,
+      30000,
+      function () {
+        refresh()
+      },
+      {}
+    )
   }
 }
 

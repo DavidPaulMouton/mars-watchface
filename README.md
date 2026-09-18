@@ -7,7 +7,8 @@ Amazfit Bip 6 watchface (390×450). Mars completes one rotation per Earth day.
 ## Face
 
 - Photoreal globe from a NASA Viking–derived albedo map
-- 48 frames, 7.5° every 30 minutes
+- 48 globe frames on a static starfield, 7.5° every 30 minutes
+- The face refreshes the globe when the watch wakes and on each minute
 - Lighting is fixed (sun from the right-front); the surface turns under it
 - Industrial stencil time `HH:MM` (Black Ops One)
 - Date as `M/D` (no leading zeros)

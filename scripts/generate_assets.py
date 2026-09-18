@@ -437,23 +437,27 @@ def main() -> None:
         tex = load_texture()
         print("starfield...")
         stars = make_starfield()
-        stars.save(ASSETS / "starfield.png")
-
-        print(f"rendering {FRAME_COUNT} mars frames...")
+        stars.save(ASSETS / "starfield.png", optimize=True, compress_level=9)
+        print(f"rendering {FRAME_COUNT} mars globes...")
         hours_per_frame = 24.0 / FRAME_COUNT
         showcase_i = int(round(SHOWCASE_HOUR / hours_per_frame)) % FRAME_COUNT
+        mars_dir = ASSETS / "mars"
+        for old in mars_dir.glob("*"):
+            old.unlink()
         for i in range(FRAME_COUNT):
             lon = hour_to_lon(i * hours_per_frame)
             globe = render_globe(tex, lon, MARS_DIAM)
-            frame = composite_frame(stars, globe)
-            dest = ASSETS / "mars" / f"{i:02d}.png"
-            frame.save(dest, optimize=True, compress_level=9)
+            dest = mars_dir / f"{i:02d}.png"
+            globe.save(dest, optimize=True, compress_level=9)
             print(f"  {dest.name} {dest.stat().st_size // 1024} KB")
             if i == showcase_i:
-                showcase = (frame, globe)
+                showcase = (composite_frame(stars, globe), globe)
     else:
-        frame = Image.open(ASSETS / "mars" / f"{int(SHOWCASE_HOUR):02d}.png")
-        showcase = (frame, None)
+        hours_per_frame = 24.0 / FRAME_COUNT
+        showcase_i = int(round(SHOWCASE_HOUR / hours_per_frame)) % FRAME_COUNT
+        globe = Image.open(ASSETS / "mars" / f"{showcase_i:02d}.png")
+        stars = Image.open(ASSETS / "starfield.png")
+        showcase = (composite_frame(stars.convert("RGB"), globe), globe)
 
     print("glyphs...")
     time_metrics = generate_time_digits()

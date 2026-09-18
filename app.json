@@ -5,8 +5,8 @@
     "appName": "Mars",
     "appType": "watchface",
     "version": {
-      "code": 9,
-      "name": "1.0.8"
+      "code": 12,
+      "name": "1.1.1"
     },
     "icon": "icon.png",
     "vender": "david",
