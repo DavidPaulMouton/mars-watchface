@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+tools/*.jpg
+tools/watch_preview.png
+tools/font_samples/
+preview-url.txt
+preview-qr.png
+scripts/__pycache__/

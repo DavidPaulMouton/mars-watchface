@@ -1,0 +1,11 @@
+{
+  "name": "mars-watchface",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Amazfit Bip 6 watchface — Mars rotating once per Earth day",
+  "scripts": {
+    "assets": "python scripts/generate_assets.py",
+    "build": "zeus build",
+    "preview": "zeus preview"
+  }
+}
